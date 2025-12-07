@@ -1,0 +1,29 @@
+{
+  "home": {
+    "title": "เริ่มต้นได้เลยด้วยการแก้ไขไฟล์ page.tsx",
+    "description": "กำลังมองหาจุดเริ่มต้นหรือคำแนะนำเพิ่มเติมใช่ไหม? ไปที่ <templates>เทมเพลต</templates> หรือศูนย์ <learning>การเรียนรู้</learning>",
+    "deployNow": "Deploy ทันที",
+    "documentation": "เอกสาร"
+  },
+  "nav": {
+    "signIn": "ลงชื่อเข้าใช้",
+    "profile": "โปรไฟล์",
+    "settings": "ตั้งค่า",
+    "signOut": "ออกจากระบบ",
+    "menu": "เมนู"
+  },
+  "auth": {
+    "signIn": "ลงชื่อเข้าใช้",
+    "signInDescription": "ใช้อีเมลและรหัสผ่านเพื่อลงชื่อเข้าใช้",
+    "signUp": "สมัครสมาชิก",
+    "forgotPassword": "ลืมรหัสผ่าน",
+    "emailPlaceholder": "อีเมลของคุณ",
+    "passwordPlaceholder": "รหัสผ่านของคุณ",
+    "magicLinkEmail": "ตรวจสอบอีเมลของคุณเพื่อลงชื่อเข้าใช้",
+    "forgotPasswordEmail": "ตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่าน",
+    "resetPasswordSuccess": "รีเซ็ตรหัสผ่านสำเร็จ!",
+    "changePasswordSuccess": "เปลี่ยนรหัสผ่านสำเร็จ!",
+    "deleteAccountSuccess": "ลบบัญชีสำเร็จ!"
+  }
+}
+

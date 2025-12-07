@@ -1,0 +1,29 @@
+{
+  "home": {
+    "title": "To get started, edit the page.tsx file.",
+    "description": "Looking for a starting point or more instructions? Head over to <templates>Templates</templates> or the <learning>Learning</learning> center.",
+    "deployNow": "Deploy Now",
+    "documentation": "Documentation"
+  },
+  "nav": {
+    "signIn": "Sign In",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "menu": "Menu"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signInDescription": "Use your email and password to sign in.",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password",
+    "emailPlaceholder": "your-email@example.com",
+    "passwordPlaceholder": "Secret password",
+    "magicLinkEmail": "Check your inbox for your login link!",
+    "forgotPasswordEmail": "Check your inbox for your password reset link!",
+    "resetPasswordSuccess": "Password reset successfully!",
+    "changePasswordSuccess": "Password changed successfully!",
+    "deleteAccountSuccess": "Account deleted successfully!"
+  }
+}
+
