@@ -99,9 +99,6 @@ export function Navbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/account/profile">{t("profile")}</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link href="/account/settings">{t("settings")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -162,13 +159,6 @@ export function Navbar() {
 
                 {session?.user ? (
                   <>
-                    <Link
-                      href="/account/profile"
-                      className="block rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {t("profile")}
-                    </Link>
                     <Link
                       href="/account/settings"
                       className="block rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
