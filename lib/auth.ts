@@ -11,6 +11,12 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
+        forgotPassword: true, // Explicitly disable reset password
+        sendResetPassword: async ({ user, url, token }) => {
+			// Send reset password email
+            
+		},
+		resetPasswordTokenExpiresIn: 3600, // 1 hour
     },
     socialProviders: {
         google: {

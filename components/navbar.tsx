@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { Menu, X, Moon, Sun, Monitor, Globe } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,7 +29,9 @@ import { authClient } from "@/lib/auth-client";
 export function Navbar() {
   const t = useTranslations("nav");
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   // Get session data from Better Auth
   const { data: session, isPending } = authClient.useSession();
@@ -55,6 +58,13 @@ export function Navbar() {
       .slice(0, 2);
   };
 
+  const changeLanguage = (locale: string) => {
+    const segments = pathname.split('/');
+    segments[1] = locale;
+    const newPath = segments.join('/');
+    router.push(newPath);
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -65,7 +75,49 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden items-center space-x-6 md:flex">
+          <div className="hidden items-center space-x-2 md:flex">
+            {/* Theme Toggle */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="sr-only">{t("toggleTheme")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Sun className="mr-2 h-4 w-4" />
+                  <span>{t("light")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Moon className="mr-2 h-4 w-4" />
+                  <span>{t("dark")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Monitor className="mr-2 h-4 w-4" />
+                  <span>{t("system")}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Language Toggle */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Globe className="h-5 w-5" />
+                  <span className="sr-only">{t("changeLanguage")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>
+                  🇺🇸 English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage("th")}>
+                  🇹🇭 ไทย
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Auth Section - Desktop */}
             {isPending ? (
@@ -134,6 +186,75 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="mt-8 flex flex-col space-y-4">
+                {/* Theme Toggle - Mobile */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground px-4">
+                    {t("toggleTheme")}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 px-4">
+                    <Button
+                      variant={theme === "light" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTheme("light")}
+                      className="w-full"
+                    >
+                      <Sun className="mr-2 h-4 w-4" />
+                      {t("light")}
+                    </Button>
+                    <Button
+                      variant={theme === "dark" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTheme("dark")}
+                      className="w-full"
+                    >
+                      <Moon className="mr-2 h-4 w-4" />
+                      {t("dark")}
+                    </Button>
+                    <Button
+                      variant={theme === "system" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTheme("system")}
+                      className="w-full"
+                    >
+                      <Monitor className="mr-2 h-4 w-4" />
+                      {t("system")}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Language Toggle - Mobile */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground px-4">
+                    {t("changeLanguage")}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 px-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        changeLanguage("en");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      🇺🇸 English
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        changeLanguage("th");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      🇹🇭 ไทย
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4" />
+
                 {/* User Info - Mobile */}
                 {session?.user && (
                   <div className="flex items-center space-x-3 rounded-lg bg-muted p-4">
