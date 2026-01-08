@@ -1,22 +1,32 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/db"; // your drizzle instance
-import * as schema from "@/db/schema";
-import { openAPI } from "better-auth/plugins"
+import { betterAuth } from "better-auth"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { db } from "@/db"
+import * as schema from "@/db/schema"
+import { openAPI, bearer } from "better-auth/plugins"
+
+// Trusted origins สำหรับ Better Auth
+const trustedOrigins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "tauri://localhost",
+    "https://tauri.localhost",
+    "http://tauri.localhost",
+    process.env.NEXT_PUBLIC_API_URL,
+].filter(Boolean) as string[]
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
-        provider: "pg", // or "mysql", "sqlite"
+        provider: "pg",
         schema,
     }),
+    trustedOrigins,
     emailAndPassword: {
         enabled: true,
-        forgotPassword: true, // Explicitly disable reset password
-        sendResetPassword: async ({ user, url, token }) => {
-			// Send reset password email
-            
-		},
-		resetPasswordTokenExpiresIn: 3600, // 1 hour
+        forgotPassword: true,
+        sendResetPassword: async () => {
+            // TODO: Send reset password email
+        },
+        resetPasswordTokenExpiresIn: 3600,
     },
     socialProviders: {
         google: {
@@ -26,5 +36,6 @@ export const auth = betterAuth({
     },
     plugins: [
         openAPI(),
+        bearer(),
     ],
-});
+})

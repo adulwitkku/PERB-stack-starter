@@ -31,7 +31,10 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+
+# tauri local config (มี network IP ส่วนตัว)
+src-tauri/tauri.conf.local.json
 
 # vercel
 .vercel
@@ -41,3 +44,7 @@ yarn-error.log*
 next-env.d.ts
 drizzle
 .vscode
+
+playwright-report
+test-results
+bun.lock
