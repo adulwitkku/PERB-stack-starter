@@ -10,7 +10,6 @@
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio",
-    "tauri": "tauri",
     "android": "tauri android dev",
     "ios": "tauri ios dev 'iPhone 15'",
     "test": "bunx playwright test",
