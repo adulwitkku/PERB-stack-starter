@@ -1,7 +1,0 @@
-{
-  "enabledMcpjsonServers": [
-    "next-devtools",
-    "shadcn",
-    "better-auth"
-  ]
-}

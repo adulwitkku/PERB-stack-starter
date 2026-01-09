@@ -12,7 +12,9 @@
     "studio": "drizzle-kit studio",
     "tauri": "tauri",
     "android": "tauri android dev",
-    "ios": "tauri ios dev 'iPhone 15'"
+    "ios": "tauri ios dev 'iPhone 15'",
+    "test": "bunx playwright test",
+    "test:ui": "bunx playwright test --ui"
   },
   "dependencies": {
     "@daveyplate/better-auth-ui": "^3.3.12",
@@ -37,6 +39,7 @@
     "pg": "^8.16.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
