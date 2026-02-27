@@ -30,6 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     router.refresh()
                 }}
                 Link={Link}
+                social={{ providers: ["google"] }}
                 localization={{
                     UNKNOWN: t('unknown'),
                     MEMBER_PLURAL: t('memberPlural'),
