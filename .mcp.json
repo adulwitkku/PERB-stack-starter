@@ -37,7 +37,7 @@
         "--access-mode=unrestricted"
       ],
       "env": {
-        "DATABASE_URI": "postgresql://postgres:randompassword@localhost:5432/perb_db"
+        "DATABASE_URI": "postgresql://postgres:randompassword@localhost:5433/perb_db"
       }
     }
   }

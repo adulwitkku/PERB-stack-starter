@@ -30,19 +30,26 @@ PERB Stack Starter is a full-stack template that includes:
 │   │   └── page.tsx        # Homepage
 │   └── api/
 │       └── [[...slugs]]/   # Elysia API catch-all route
-│           └── route.ts    # API entry point
+│           └── route.ts    # API entry point (.use() modules)
+├── modules/                # Elysia MVC modules (feature-based)
+│   └── auth/
+│       ├── index.ts        # Controller (Elysia routes)
+│       └── service.ts      # Business logic (abstract class)
 ├── components/
 │   ├── navbar.tsx          # Main navigation
 │   └── ui/                 # shadcn/ui components
 ├── db/
 │   ├── index.ts            # Database connection
-│   └── schema.ts           # Drizzle schema (user, session, account, verification)
+│   ├── schema.ts           # Drizzle schema (user, session, account, verification)
+│   ├── model.ts            # Drizzle-TypeBox model spreads (single source of truth)
+│   └── utils.ts            # spread/spreads utility for drizzle-typebox
 ├── i18n/
 │   ├── routing.ts          # Locale configuration
 │   └── request.ts          # Server-side locale
 ├── lib/
 │   ├── auth.ts             # Better Auth server config
 │   ├── auth-client.ts      # Better Auth client (+ Tauri support)
+│   ├── eden.ts             # Eden Treaty client (end-to-end type safety)
 │   └── utils.ts            # Utility functions (cn)
 ├── messages/               # Translation files
 │   ├── en.json
@@ -256,11 +263,14 @@ Or use MCP `user-shadcn`:
 
 1. **Database changes?**
    - Edit `db/schema.ts`
+   - Add table to `db/model.ts` spreads
    - Run `bun run generate` → `bun run migrate`
 
 2. **New API endpoint?**
-   - Edit `app/api/[[...slugs]]/route.ts`
-   - Add new routes to Elysia app
+   - Create a new module in `modules/<feature>/`
+   - `index.ts` = Elysia controller, `service.ts` = business logic, `model.ts` = validation (Elysia.t)
+   - `.use()` the module in `app/api/[[...slugs]]/route.ts`
+   - Use `drizzle-typebox` via `db/model.ts` for validation models
 
 3. **New page?**
    - Create file in `app/[locale]/your-page/page.tsx`
@@ -269,25 +279,24 @@ Or use MCP `user-shadcn`:
 4. **New component?**
    - Add to `components/` or use shadcn/ui
 
-### Module Structure (for complex features)
+5. **Calling API from frontend (type-safe)?**
+   - Use Eden Treaty client from `lib/eden.ts`
 
-```
-app/
-├── [locale]/
-│   └── feature/
-│       └── page.tsx         # Page component
-├── api/
-│   └── [[...slugs]]/
-│       └── route.ts         # Add routes here
-```
+### Module Structure (Elysia MVC)
 
-For Elysia MVC pattern (recommended for large APIs):
+Each API feature follows this pattern:
 ```
 modules/
-├── user/
-│   ├── index.ts    # Controller (Elysia routes)
-│   ├── service.ts  # Business logic
-│   └── model.ts    # Types/validation
+├── <feature>/
+│   ├── index.ts    # Controller (Elysia instance with routes)
+│   ├── service.ts  # Business logic (abstract class + static methods)
+│   └── model.ts    # Validation schema (Elysia.t / drizzle-typebox)
+```
+
+Then compose in `route.ts`:
+```typescript
+import { featureModule } from "@/modules/<feature>"
+const app = new Elysia({ prefix: "/api" }).use(featureModule)
 ```
 
 ---
