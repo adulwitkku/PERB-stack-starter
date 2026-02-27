@@ -2,13 +2,15 @@ import { Elysia } from "elysia"
 import cors from "@elysiajs/cors"
 import openapi from "@elysiajs/openapi"
 import { authModule } from "@/modules/auth"
-import { todoModule } from "@/modules/todo"
+import { todoV1Module } from "@/modules/todo-v1"
+import { todoV2Module } from "@/modules/todo"
 
 const app = new Elysia({ prefix: "/api" })
     .use(cors())
     .use(openapi())
     .use(authModule)
-    .use(todoModule)
+    .use(todoV1Module)
+    .use(todoV2Module)
     .get("/", "Hello Nextjs")
 
 export type App = typeof app

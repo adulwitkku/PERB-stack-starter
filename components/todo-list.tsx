@@ -45,7 +45,7 @@ export function TodoList() {
 
     const fetchTodos = useCallback(async () => {
         try {
-            const res = await fetch("/api/todo", { credentials: "include" })
+            const res = await fetch("/api/v2/todo", { credentials: "include" })
             if (res.ok) setTodos(await res.json())
         } finally {
             setLoading(false)
@@ -63,7 +63,7 @@ export function TodoList() {
 
         setAdding(true)
         try {
-            const res = await fetch("/api/todo", {
+            const res = await fetch("/api/v2/todo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -84,7 +84,7 @@ export function TodoList() {
         setTodos((prev) =>
             prev.map((t) => (t.id === id ? { ...t, completed } : t)),
         )
-        await fetch(`/api/todo/${id}`, {
+        await fetch(`/api/v2/todo/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -94,7 +94,7 @@ export function TodoList() {
 
     const deleteTodo = async (id: string) => {
         setTodos((prev) => prev.filter((t) => t.id !== id))
-        await fetch(`/api/todo/${id}`, {
+        await fetch(`/api/v2/todo/${id}`, {
             method: "DELETE",
             credentials: "include",
         })
