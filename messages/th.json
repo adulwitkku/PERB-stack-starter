@@ -5,6 +5,13 @@
     "deployNow": "Deploy ทันที",
     "documentation": "เอกสาร"
   },
+  "todo": {
+    "title": "รายการของฉัน",
+    "addPlaceholder": "เพิ่มสิ่งที่ต้องทำ...",
+    "add": "เพิ่ม",
+    "empty": "ยังไม่มีรายการ เพิ่มรายการแรกได้เลย!",
+    "deleteConfirm": "ลบรายการนี้?"
+  },
   "nav": {
     "signIn": "ลงชื่อเข้าใช้",
     "profile": "โปรไฟล์",

@@ -5,6 +5,13 @@
     "deployNow": "Deploy Now",
     "documentation": "Documentation"
   },
+  "todo": {
+    "title": "My Todos",
+    "addPlaceholder": "What needs to be done?",
+    "add": "Add",
+    "empty": "No todos yet. Add one above!",
+    "deleteConfirm": "Delete this todo?"
+  },
   "nav": {
     "signIn": "Sign In",
     "profile": "Profile",
