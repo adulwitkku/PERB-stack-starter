@@ -10,9 +10,18 @@
     "addPlaceholder": "เพิ่มสิ่งที่ต้องทำ...",
     "add": "เพิ่ม",
     "empty": "ยังไม่มีรายการ เพิ่มรายการแรกได้เลย!",
-    "deleteConfirm": "ลบรายการนี้?"
+    "deleteConfirm": "ลบรายการนี้?",
+    "status": "สถานะ",
+    "columnTitle": "ชื่อรายการ",
+    "createdAt": "สร้างเมื่อ",
+    "filterPlaceholder": "ค้นหารายการ...",
+    "totalItems": "{count} รายการ",
+    "previous": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "pageInfo": "หน้า {current} จาก {total}"
   },
   "nav": {
+    "todo": "รายการของฉัน",
     "signIn": "ลงชื่อเข้าใช้",
     "profile": "โปรไฟล์",
     "settings": "ตั้งค่า",

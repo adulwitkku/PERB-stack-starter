@@ -1,12 +1,30 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useTranslations } from "next-intl"
-import { Plus, Trash2, Loader2 } from "lucide-react"
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
+import { Plus, Trash2, Loader2, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 interface Todo {
     id: string
@@ -21,6 +39,9 @@ export function TodoList() {
     const [newTitle, setNewTitle] = useState("")
     const [loading, setLoading] = useState(true)
     const [adding, setAdding] = useState(false)
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
     const fetchTodos = useCallback(async () => {
         try {
@@ -55,6 +76,7 @@ export function TodoList() {
             }
         } finally {
             setAdding(false)
+            requestAnimationFrame(() => inputRef.current?.focus())
         }
     }
 
@@ -78,72 +100,214 @@ export function TodoList() {
         })
     }
 
-    return (
-        <Card className="w-full max-w-lg">
-            <CardHeader>
-                <CardTitle className="text-2xl">{t("title")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <form onSubmit={addTodo} className="flex gap-2">
-                    <Input
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder={t("addPlaceholder")}
-                        disabled={adding}
-                        autoFocus
-                    />
-                    <Button type="submit" size="icon" disabled={adding || !newTitle.trim()}>
-                        {adding ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <Plus className="h-4 w-4" />
-                        )}
+    const columns: ColumnDef<Todo>[] = [
+        {
+            id: "index",
+            header: "#",
+            cell: ({ row }) => (
+                <span className="text-muted-foreground">{row.index + 1}</span>
+            ),
+            enableSorting: false,
+        },
+        {
+            id: "completed",
+            header: t("status"),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.original.completed}
+                    onCheckedChange={(checked) =>
+                        toggleTodo(row.original.id, checked === true)
+                    }
+                />
+            ),
+            enableSorting: false,
+        },
+        {
+            accessorKey: "title",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    {t("columnTitle")}
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <span
+                    className={
+                        row.original.completed
+                            ? "text-muted-foreground line-through"
+                            : ""
+                    }
+                >
+                    {row.original.title}
+                </span>
+            ),
+        },
+        {
+            accessorKey: "createdAt",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    {t("createdAt")}
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <span className="text-muted-foreground text-sm">
+                    {new Date(row.original.createdAt).toLocaleString()}
+                </span>
+            ),
+        },
+        {
+            id: "actions",
+            cell: ({ row }) => (
+                <div className="text-right">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => deleteTodo(row.original.id)}
+                    >
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
-                </form>
+                </div>
+            ),
+        },
+    ]
 
-                {loading ? (
-                    <div className="flex justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+    const table = useReactTable({
+        data: todos,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting,
+        getSortedRowModel: getSortedRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
+        state: { sorting, columnFilters },
+        initialState: { pagination: { pageSize: 10 } },
+    })
+
+    return (
+        <div className="w-full space-y-4">
+            <h2 className="text-2xl font-bold">{t("title")}</h2>
+
+            <form onSubmit={addTodo} className="flex gap-2">
+                <Input
+                    ref={inputRef}
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder={t("addPlaceholder")}
+                    disabled={adding}
+                    autoFocus
+                />
+                <Button type="submit" size="icon" disabled={adding || !newTitle.trim()}>
+                    {adding ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Plus className="h-4 w-4" />
+                    )}
+                </Button>
+            </form>
+
+            <div className="flex items-center gap-2">
+                <Input
+                    placeholder={t("filterPlaceholder")}
+                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) =>
+                        table.getColumn("title")?.setFilterValue(e.target.value)
+                    }
+                    className="max-w-sm"
+                />
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+            ) : (
+                <>
+                    <div className="overflow-hidden rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column.columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={columns.length}
+                                            className="h-24 text-center"
+                                        >
+                                            {t("empty")}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
-                ) : todos.length === 0 ? (
-                    <p className="py-8 text-center text-sm text-muted-foreground">
-                        {t("empty")}
-                    </p>
-                ) : (
-                    <ul className="space-y-1">
-                        {todos.map((todo) => (
-                            <li
-                                key={todo.id}
-                                className="group flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted/50"
+
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">
+                            {t("totalItems", { count: table.getFilteredRowModel().rows.length })}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
                             >
-                                <Checkbox
-                                    checked={todo.completed}
-                                    onCheckedChange={(checked) =>
-                                        toggleTodo(todo.id, checked === true)
-                                    }
-                                />
-                                <span
-                                    className={`flex-1 text-sm ${
-                                        todo.completed
-                                            ? "text-muted-foreground line-through"
-                                            : ""
-                                    }`}
-                                >
-                                    {todo.title}
-                                </span>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
-                                    onClick={() => deleteTodo(todo.id)}
-                                >
-                                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </CardContent>
-        </Card>
+                                {t("previous")}
+                            </Button>
+                            <span className="text-sm text-muted-foreground">
+                                {t("pageInfo", {
+                                    current: table.getState().pagination.pageIndex + 1,
+                                    total: table.getPageCount(),
+                                })}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                {t("next")}
+                            </Button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
     )
 }

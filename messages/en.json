@@ -10,9 +10,18 @@
     "addPlaceholder": "What needs to be done?",
     "add": "Add",
     "empty": "No todos yet. Add one above!",
-    "deleteConfirm": "Delete this todo?"
+    "deleteConfirm": "Delete this todo?",
+    "status": "Status",
+    "columnTitle": "Title",
+    "createdAt": "Created",
+    "filterPlaceholder": "Filter todos...",
+    "totalItems": "{count} item(s)",
+    "previous": "Previous",
+    "next": "Next",
+    "pageInfo": "Page {current} of {total}"
   },
   "nav": {
+    "todo": "Todo",
     "signIn": "Sign In",
     "profile": "Profile",
     "settings": "Settings",

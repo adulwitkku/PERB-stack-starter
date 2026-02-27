@@ -152,6 +152,10 @@ export function Navbar() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
+                      <Link href="/todo">{t("todo")}</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
                       <Link href="/account/settings">{t("settings")}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
