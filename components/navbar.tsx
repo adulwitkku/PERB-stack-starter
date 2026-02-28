@@ -65,6 +65,11 @@ export function Navbar() {
     router.push(newPath);
   };
 
+  const navItems = [
+    { href: "/todo", label: t("todo") },
+    { href: "/account/settings", label: t("settings") },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-[env(safe-area-inset-top)]">
       <div className="container mx-auto px-4">
@@ -150,14 +155,14 @@ export function Navbar() {
                         </p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/todo">{t("todo")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/account/settings">{t("settings")}</Link>
-                    </DropdownMenuItem>
+                    {navItems.map((item) => (
+                      <div key={item.href}>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={item.href}>{item.label}</Link>
+                        </DropdownMenuItem>
+                      </div>
+                    ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleSignOut}
@@ -215,13 +220,16 @@ export function Navbar() {
                   {/* Navigation Links - Mobile */}
                   {session?.user ? (
                     <>
-                      <Link
-                        href="/account/settings"
-                        className="block rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {t("settings")}
-                      </Link>
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
                       <div className="border-t pt-4 px-4">
                         <Button
                           variant="destructive"
