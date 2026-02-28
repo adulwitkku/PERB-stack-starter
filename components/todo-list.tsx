@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useRef } from "react"
 import { useTranslations } from "next-intl"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -25,6 +26,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { api } from "@/lib/eden"
 
 interface Todo {
     id: string
@@ -35,69 +37,85 @@ interface Todo {
 
 export function TodoList() {
     const t = useTranslations("todo")
-    const [todos, setTodos] = useState<Todo[]>([])
+    const queryClient = useQueryClient()
     const [newTitle, setNewTitle] = useState("")
-    const [loading, setLoading] = useState(true)
-    const [adding, setAdding] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-    const fetchTodos = useCallback(async () => {
-        try {
-            const res = await fetch("/api/v2/todo", { credentials: "include" })
-            if (res.ok) setTodos(await res.json())
-        } finally {
-            setLoading(false)
-        }
-    }, [])
+    const { data: todos = [], isLoading: loading } = useQuery({
+        queryKey: ["todos"],
+        queryFn: async () => {
+            const { data, error } = await api.v2.todo.get()
+            if (error) throw error
+            return data as unknown as Todo[]
+        },
+    })
 
-    useEffect(() => {
-        fetchTodos()
-    }, [fetchTodos])
+    const addMutation = useMutation({
+        mutationFn: async (title: string) => {
+            const { data, error } = await api.v2.todo.post({ title })
+            if (error) throw error
+            return data as unknown as Todo
+        },
+        onSuccess: (newTodo) => {
+            queryClient.setQueryData<Todo[]>(["todos"], (old = []) => [newTodo, ...old])
+            setNewTitle("")
+            requestAnimationFrame(() => inputRef.current?.focus())
+        },
+    })
 
-    const addTodo = async (e: React.FormEvent) => {
+    const toggleMutation = useMutation({
+        mutationFn: async ({ id, completed }: { id: string; completed: boolean }) => {
+            const { data, error } = await api.v2.todo({ id }).patch({ completed })
+            if (error) throw error
+            return data as unknown as Todo
+        },
+        onMutate: async ({ id, completed }) => {
+            await queryClient.cancelQueries({ queryKey: ["todos"] })
+            const previous = queryClient.getQueryData<Todo[]>(["todos"])
+            queryClient.setQueryData<Todo[]>(["todos"], (old = []) =>
+                old.map((t) => (t.id === id ? { ...t, completed } : t)),
+            )
+            return { previous }
+        },
+        onError: (_err, _vars, context) => {
+            if (context?.previous) queryClient.setQueryData(["todos"], context.previous)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+    })
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id: string) => {
+            await api.v2.todo({ id }).delete()
+        },
+        onMutate: async (id) => {
+            await queryClient.cancelQueries({ queryKey: ["todos"] })
+            const previous = queryClient.getQueryData<Todo[]>(["todos"])
+            queryClient.setQueryData<Todo[]>(["todos"], (old = []) =>
+                old.filter((t) => t.id !== id),
+            )
+            return { previous }
+        },
+        onError: (_err, _vars, context) => {
+            if (context?.previous) queryClient.setQueryData(["todos"], context.previous)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+    })
+
+    const addTodo = (e: React.FormEvent) => {
         e.preventDefault()
         const title = newTitle.trim()
         if (!title) return
-
-        setAdding(true)
-        try {
-            const res = await fetch("/api/v2/todo", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ title }),
-            })
-            if (res.ok) {
-                const todo = await res.json()
-                setTodos((prev) => [todo, ...prev])
-                setNewTitle("")
-            }
-        } finally {
-            setAdding(false)
-            requestAnimationFrame(() => inputRef.current?.focus())
-        }
+        addMutation.mutate(title)
     }
 
-    const toggleTodo = async (id: string, completed: boolean) => {
-        setTodos((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, completed } : t)),
-        )
-        await fetch(`/api/v2/todo/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ completed }),
-        })
+    const toggleTodo = (id: string, completed: boolean) => {
+        toggleMutation.mutate({ id, completed })
     }
 
-    const deleteTodo = async (id: string) => {
-        setTodos((prev) => prev.filter((t) => t.id !== id))
-        await fetch(`/api/v2/todo/${id}`, {
-            method: "DELETE",
-            credentials: "include",
-        })
+    const deleteTodo = (id: string) => {
+        deleteMutation.mutate(id)
     }
 
     const columns: ColumnDef<Todo>[] = [
@@ -202,11 +220,11 @@ export function TodoList() {
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder={t("addPlaceholder")}
-                    disabled={adding}
+                    disabled={addMutation.isPending}
                     autoFocus
                 />
-                <Button type="submit" size="icon" disabled={adding || !newTitle.trim()}>
-                    {adding ? (
+                <Button type="submit" size="icon" disabled={addMutation.isPending || !newTitle.trim()}>
+                    {addMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                         <Plus className="h-4 w-4" />

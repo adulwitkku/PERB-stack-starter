@@ -3,8 +3,10 @@
 import { AuthUIProvider } from "@daveyplate/better-auth-ui"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { ThemeProvider } from "next-themes"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -13,8 +15,16 @@ import { useTranslations } from 'next-intl';
 export function Providers({ children }: { children: ReactNode }) {
     const router = useRouter()
     const t = useTranslations('auth');
+    const [queryClient] = useState(() => new QueryClient({
+        defaultOptions: {
+            queries: {
+                staleTime: 60 * 1000,
+            },
+        },
+    }))
 
     return (
+        <QueryClientProvider client={queryClient}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -293,5 +303,7 @@ export function Providers({ children }: { children: ReactNode }) {
                 {children}
             </AuthUIProvider>
         </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
     )
 }
