@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+echo "🎨 Checking code formatting..."
+bun run format:check || {
+  echo "❌ Code formatting check failed. Please run 'bun run format' to fix."
+  exit 1
+}
+
+
+echo "📝 Running linter..."
+bun run lint || {
+  echo "❌ Linter failed. Please fix errors before commit."
+  exit 1
+}
+
+echo "🧪 Running tests with coverage..."
+bun run test:unit:coverage || {
+  echo "❌ Tests failed. Commit cancelled."
+  exit 1
+}
+
+echo "🔧 Building API server..."
+bun run api:build || {
+  echo "❌ API build failed. Commit cancelled."
+  exit 1
+}
+
+echo "🔨 Building Next.js application..."
+bun run build || {
+  echo "❌ Next.js build failed. Commit cancelled."
+  exit 1
+}
+
+echo "✅ All checks passed. Commit allowed."

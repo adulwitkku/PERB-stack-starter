@@ -62,23 +62,23 @@ NEXT_PUBLIC_API_URL=http://192.168.1.xxx:3000
 ### 3. เริ่ม Database (PostgreSQL)
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose-db.yml up -d
 ```
 
-รัน PostgreSQL container ใน background mode  
+รัน PostgreSQL container ใน background mode (ไฟล์ compose อยู่ที่ `docker-compose-db.yml`)  
 📖 [Docker Compose Docs](https://docs.docker.com/compose/)
 
 ### 4. สร้าง Database Schema
 
 ```bash
-bun run generate
+bun run db:generate
 ```
 
 Generate migration files จาก schema ที่กำหนดใน `db/schema.ts`  
 📖 [Drizzle Kit Docs](https://orm.drizzle.team/kit-docs/overview)
 
 ```bash
-bun run migrate
+bun run db:migrate
 ```
 
 Apply migrations ไปยัง database  
@@ -105,17 +105,17 @@ bun run dev
 | `bun run dev` | เริ่ม Next.js dev server (http://localhost:3000) |
 | `bun run build` | Build production version |
 | `bun run start` | รัน production server |
-| `bun run lint` | ตรวจสอบ code ด้วย ESLint |
+| `bun run lint` | ตรวจสอบ code ด้วย Oxlint |
 
 ### Database
 
 | Command | Description |
 |---------|-------------|
-| `docker compose up -d` | เริ่ม PostgreSQL database |
-| `docker compose down` | หยุด PostgreSQL database |
-| `bun run generate` | Generate migrations จาก schema |
-| `bun run migrate` | Apply migrations ไปยัง database |
-| `bun run studio` | เปิด Drizzle Studio (Database GUI) |
+| `docker compose -f docker-compose-db.yml up -d` | เริ่ม PostgreSQL database |
+| `docker compose -f docker-compose-db.yml down` | หยุด PostgreSQL database |
+| `bun run db:generate` | Generate migrations จาก schema |
+| `bun run db:migrate` | Apply migrations ไปยัง database |
+| `bun run db:studio` | เปิด Drizzle Studio (Database GUI) |
 
 📖 [Drizzle ORM Docs](https://orm.drizzle.team/docs/overview)
 
@@ -132,8 +132,10 @@ bun run dev
 
 | Command | Description |
 |---------|-------------|
-| `bun run test` | รัน E2E tests แบบ headless |
-| `bun run test:ui` | รัน tests พร้อม Playwright UI |
+| `bun run test` | รัน Vitest (unit/integration) + Playwright E2E |
+| `bun run test:unit` | รัน Vitest เท่านั้น |
+| `bun run test:e2e` | รัน Playwright แบบ headless |
+| `bun run test:e2e:ui` | รัน Playwright พร้อม UI |
 
 📖 [Playwright Docs](https://playwright.dev/docs/intro)
 
@@ -160,21 +162,32 @@ bun run dev
 ## 📁 Project Structure
 
 ```
-├── app/                    # Next.js App Router
-│   ├── [locale]/           # i18n routes (en, th)
-│   │   ├── auth/           # Authentication pages
-│   │   ├── account/        # User account pages
-│   │   └── page.tsx        # Homepage
-│   └── api/                # Elysia API routes
-├── components/             # React components
-│   └── ui/                 # shadcn/ui components
-├── db/                     # Database schema & connection
-├── lib/                    # Utilities & auth config
-├── messages/               # i18n translation files
-├── src-tauri/              # Tauri native app config
-├── tests/                  # Playwright E2E tests
-└── llms/                   # LLM documentation files
+├── app/
+│   ├── [locale]/           # i18n routes (en, th): pages, layout, providers
+│   └── api/[[...slugs]]/   # Next.js catch-all → Elysia (`modules/server.ts`)
+├── components/             # React components (+ shadcn/ui ใน ui/)
+├── db/                     # Drizzle schema, connection, model spreads
+├── lib/                    # Eden client, auth, utilities
+├── modules/                # Elysia feature modules (ดูด้านล่าง)
+├── messages/               # next-intl (en.json, th.json)
+├── src-tauri/              # Tauri native app
+├── tests/                  # Playwright E2E (TC*.spec.ts)
+└── llms/                   # เอกสารอ้างอิงสำหรับ AI / ทีม
 ```
+
+### `modules/` — API แยกตามฟีเจอร์
+
+- **`server.ts`** — ประกอบ Elysia root (`/api`): CORS, OpenAPI, `authModule`, `todoModule`
+- **`auth/`** — แพตเทิร์นแบบ controller + service + model (เหมาะกับฟีเจอร์ที่ตรงไปตรงมา)
+- **`todo/`** — ตัวอย่าง **Hexagonal architecture (Ports & Adapters)**  
+  - `domain/` — entity กฎธุรกิจ  
+  - `application/` — use cases + ports (in/out)  
+  - `infrastructure/` — adapter เข้า (Elysia controller) / adapter ออก (Drizzle repository) + `di/` (tsyringe)  
+  - `index.ts` — export `todoModule` ลง `server.ts`
+
+REST ของ Todo อยู่ที่ **`/api/v2/todo`** — ฝั่ง client ใช้ Eden Treaty จาก `lib/eden.ts` แบบ type-safe เช่น `api.v2.todo.get()`  
+
+เมื่อจะเพิ่มฟีเจอร์ใหม่: เลือกแพตเทิร์นเดียวกับ `auth` หรือทำแบบ `todo` ตามความซับซ้อนและความต้องการทดสอบแยกชั้น
 
 ---
 
@@ -364,7 +377,7 @@ Implement Task 1.1: Create todos table schema ตาม data-model.md
 bun run test
 
 # ดู test results แบบ interactive
-bun run test:ui
+bun run test:e2e:ui
 ```
 
 **Loop:**

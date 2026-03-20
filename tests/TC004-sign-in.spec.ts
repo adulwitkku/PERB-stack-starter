@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Sign In', () => {
   test('should show error with wrong password', async ({ page }) => {
@@ -12,9 +12,9 @@ test.describe('Sign In', () => {
     await page.getByRole('button', { name: /login/i }).click();
 
     // Expect error toast about invalid credentials
-    await expect(
-      page.getByText(/invalid|incorrect|wrong|not found/i)
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/invalid|incorrect|wrong|not found/i)).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('should show error with non-existent email', async ({ page }) => {
@@ -29,9 +29,9 @@ test.describe('Sign In', () => {
     await page.getByRole('button', { name: /login/i }).click();
 
     // Expect error toast
-    await expect(
-      page.getByText(/invalid|incorrect|not found|doesn't exist/i)
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/invalid|incorrect|not found|doesn't exist/i)).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('should navigate to sign up page', async ({ page }) => {

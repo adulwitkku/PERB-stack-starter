@@ -1,0 +1,61 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "plugins": ["nextjs", "react", "typescript", "vitest"],
+    "categories": {
+      "correctness": "error",
+      "suspicious": "warn",
+      "pedantic": "off",
+      "nursery": "off",
+      "style": "off",
+      "restriction": "off",
+      "perf": "warn"
+    },
+    "rules": {
+      "react/react-in-jsx-scope": "off",
+      "no-await-in-loop": "off",
+      "no-shadow": "warn",
+      "react/no-array-index-key": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "jest/no-commented-out-tests": "off"
+    },
+    "overrides": [
+      {
+        "files": ["components/ui/**/*.tsx", "components/ui/**/*.ts"],
+        "rules": {
+          "no-shadow": "off"
+        }
+      },
+      {
+        "files": ["modules/**/service.ts"],
+        "rules": {
+          "no-extraneous-class": "off"
+        }
+      }
+    ],
+    "settings": {
+      "next": {
+        "rootDir": ["."]
+      },
+      "react": {
+        "formComponents": [],
+        "linkComponents": [],
+        "version": null,
+        "componentWrapperFunctions": []
+      }
+    },
+    "env": {
+      "builtin": true
+    },
+    "globals": {},
+    "ignorePatterns": [
+      ".next",
+      "out",
+      "build",
+      "dist",
+      "node_modules",
+      "drizzle",
+      ".claude/skills",
+      ".agents/skills"
+    ]
+  }
+  

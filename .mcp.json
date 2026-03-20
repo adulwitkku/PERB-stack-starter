@@ -39,6 +39,10 @@
       "env": {
         "DATABASE_URI": "postgresql://postgres:randompassword@localhost:5433/perb_db"
       }
+    },
+    "tanstack": {
+      "command": "npx",
+      "args": ["@tanstack/cli", "mcp"]
     }
   }
 }

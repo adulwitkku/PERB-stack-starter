@@ -48,3 +48,6 @@ drizzle
 playwright-report
 test-results
 bun.lock
+skills-lock.json
+.agents
+.claude

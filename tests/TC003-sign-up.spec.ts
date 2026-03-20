@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Sign Up', () => {
   test('should register a new user successfully', async ({ page }) => {
@@ -18,9 +18,11 @@ test.describe('Sign Up', () => {
 
     // Wait for success - either redirect to sign-in page with toast, email verification page, or toast on current page
     await expect(
-      page.locator('[data-sonner-toast]').first()
+      page
+        .locator('[data-sonner-toast]')
+        .first()
         .or(page.getByText(/verify your email|email verification|check your email/i))
-        .or(page.locator('text=sign in').first())
+        .or(page.locator('text=sign in').first()),
     ).toBeVisible({ timeout: 15000 });
   });
 
@@ -54,8 +56,8 @@ test.describe('Sign Up', () => {
     await page.getByRole('button', { name: /create an account/i }).click();
 
     // Expect error toast about existing user
-    await expect(
-      page.getByText(/already exists|user already|email.*taken/i)
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/already exists|user already|email.*taken/i)).toBeVisible({
+      timeout: 10000,
+    });
   });
 });

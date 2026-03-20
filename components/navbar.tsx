@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
-import { Menu, X, Moon, Sun, Monitor, Globe } from "lucide-react";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { Globe, Menu, Monitor, Moon, Sun } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
@@ -23,15 +24,15 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { authClient } from "@/lib/auth-client";
+} from '@/components/ui/sheet';
+import { authClient } from '@/lib/auth-client';
 
 export function Navbar() {
-  const t = useTranslations("nav");
+  const t = useTranslations('nav');
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   // Get session data from Better Auth
   const { data: session, isPending } = authClient.useSession();
@@ -40,7 +41,7 @@ export function Navbar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/");
+          router.push('/');
           router.refresh();
         },
       },
@@ -48,12 +49,12 @@ export function Navbar() {
   };
 
   const getUserInitials = () => {
-    if (!session?.user) return "U";
-    const name = session.user.name || session.user.email || "";
+    if (!session?.user) return 'U';
+    const name = session.user.name || session.user.email || '';
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
@@ -66,8 +67,8 @@ export function Navbar() {
   };
 
   const navItems = [
-    { href: "/todo", label: t("todo") },
-    { href: "/account/settings", label: t("settings") },
+    { href: '/todo', label: t('todo') },
+    { href: '/account/settings', label: t('settings') },
   ];
 
   return (
@@ -87,21 +88,21 @@ export function Navbar() {
                 <Button variant="ghost" size="icon">
                   <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                   <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                  <span className="sr-only">{t("toggleTheme")}</span>
+                  <span className="sr-only">{t('toggleTheme')}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
+                <DropdownMenuItem onClick={() => setTheme('light')}>
                   <Sun className="mr-2 h-4 w-4" />
-                  <span>{t("light")}</span>
+                  <span>{t('light')}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
                   <Moon className="mr-2 h-4 w-4" />
-                  <span>{t("dark")}</span>
+                  <span>{t('dark')}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
+                <DropdownMenuItem onClick={() => setTheme('system')}>
                   <Monitor className="mr-2 h-4 w-4" />
-                  <span>{t("system")}</span>
+                  <span>{t('system')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -111,16 +112,12 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Globe className="h-5 w-5" />
-                  <span className="sr-only">{t("changeLanguage")}</span>
+                  <span className="sr-only">{t('changeLanguage')}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => changeLanguage("en")}>
-                  🇺🇸 English
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage("th")}>
-                  🇹🇭 ไทย
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('en')}>🇺🇸 English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('th')}>🇹🇭 ไทย</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -131,14 +128,11 @@ export function Navbar() {
               ) : session?.user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-10 w-10 rounded-full"
-                    >
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
                         <AvatarImage
                           src={session.user.image || undefined}
-                          alt={session.user.name || "User"}
+                          alt={session.user.name || 'User'}
                         />
                         <AvatarFallback>{getUserInitials()}</AvatarFallback>
                       </Avatar>
@@ -148,7 +142,7 @@ export function Navbar() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                          {session.user.name || "User"}
+                          {session.user.name || 'User'}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
                           {session.user.email}
@@ -168,13 +162,13 @@ export function Navbar() {
                       onClick={handleSignOut}
                       className="cursor-pointer text-red-600"
                     >
-                      {t("signOut")}
+                      {t('signOut')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <Button asChild>
-                  <Link href="/auth/sign-in">{t("signIn")}</Link>
+                  <Link href="/auth/sign-in">{t('signIn')}</Link>
                 </Button>
               )}
             </div>
@@ -184,15 +178,13 @@ export function Navbar() {
               <SheetTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t("menu")}</span>
+                  <span className="sr-only">{t('menu')}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <SheetHeader>
-                  <SheetTitle>{t("menu")}</SheetTitle>
-                  <SheetDescription className="sr-only">
-                    Navigation menu
-                  </SheetDescription>
+                  <SheetTitle>{t('menu')}</SheetTitle>
+                  <SheetDescription className="sr-only">Navigation menu</SheetDescription>
                 </SheetHeader>
 
                 <div className="mt-8 flex flex-col space-y-4">
@@ -202,17 +194,13 @@ export function Navbar() {
                       <Avatar className="h-12 w-12">
                         <AvatarImage
                           src={session.user.image || undefined}
-                          alt={session.user.name || "User"}
+                          alt={session.user.name || 'User'}
                         />
                         <AvatarFallback>{getUserInitials()}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <p className="text-sm font-medium">
-                          {session.user.name || "User"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {session.user.email}
-                        </p>
+                        <p className="text-sm font-medium">{session.user.name || 'User'}</p>
+                        <p className="text-xs text-muted-foreground">{session.user.email}</p>
                       </div>
                     </div>
                   )}
@@ -239,18 +227,14 @@ export function Navbar() {
                             setMobileMenuOpen(false);
                           }}
                         >
-                          {t("signOut")}
+                          {t('signOut')}
                         </Button>
                       </div>
                     </>
                   ) : (
                     <div className="px-4">
-                      <Button
-                        asChild
-                        className="w-full"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Link href="/auth/sign-in">{t("signIn")}</Link>
+                      <Button asChild className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/auth/sign-in">{t('signIn')}</Link>
                       </Button>
                     </div>
                   )}
@@ -263,4 +247,3 @@ export function Navbar() {
     </nav>
   );
 }
-

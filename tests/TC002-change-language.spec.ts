@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Language Toggle', () => {
   test('should change language from English to Thai', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Forgot Password', () => {
   test('should navigate to forgot password page from sign in', async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe('Forgot Password', () => {
       // Option 2: Redirects to sign-in page (success behavior)
       expect(page).toHaveURL(/\/auth\/sign-in/, { timeout: 10000 }),
       // Option 3: Button becomes enabled again after submission (form completed without redirect)
-      expect(submitButton).toBeEnabled({ timeout: 10000 })
+      expect(submitButton).toBeEnabled({ timeout: 10000 }),
     ]);
   });
 });

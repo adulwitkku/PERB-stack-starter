@@ -30,11 +30,11 @@ PERB Stack Starter is a full-stack template that includes:
 │   │   └── page.tsx        # Homepage
 │   └── api/
 │       └── [[...slugs]]/   # Elysia API catch-all route
-│           └── route.ts    # API entry point (.use() modules)
-├── modules/                # Elysia MVC modules (feature-based)
-│   └── auth/
-│       ├── index.ts        # Controller (Elysia routes)
-│       └── service.ts      # Business logic (abstract class)
+│           └── route.ts    # Imports app from modules/server.ts
+├── modules/                # Elysia feature modules (see server.ts)
+│   ├── server.ts           # Composes /api app (auth + todo + OpenAPI)
+│   ├── auth/               # Controller + service + model
+│   └── todo/               # Hexagonal: domain, application, infrastructure, DI
 ├── components/
 │   ├── navbar.tsx          # Main navigation
 │   └── ui/                 # shadcn/ui components
@@ -67,11 +67,11 @@ PERB Stack Starter is a full-stack template that includes:
 ```bash
 # Development
 bun dev                    # Start Next.js dev server (http://localhost:3000)
-bun run studio             # Open Drizzle Studio (database GUI)
+bun run db:studio          # Open Drizzle Studio (database GUI)
 
 # Database
-bun run generate           # Generate migrations from schema changes
-bun run migrate            # Apply migrations to database
+bun run db:generate        # Generate migrations from schema changes
+bun run db:migrate         # Apply migrations to database
 
 # Mobile/Desktop (Tauri)
 bun run android            # Run Android dev build
@@ -79,12 +79,12 @@ bun run ios                # Run iOS dev build (iPhone 15)
 bun run tauri              # Tauri CLI commands
 
 # Testing
-bun run test               # Run Playwright tests
-bun run test:ui            # Run tests with UI
+bun run test               # Vitest + Playwright E2E
+bun run test:e2e:ui        # Playwright with UI
 
 # Docker
-docker compose up          # Start PostgreSQL
-docker compose down        # Stop PostgreSQL
+docker compose -f docker-compose-db.yml up -d
+docker compose -f docker-compose-db.yml down
 ```
 
 ---
@@ -267,10 +267,10 @@ Or use MCP `user-shadcn`:
    - Run `bun run generate` → `bun run migrate`
 
 2. **New API endpoint?**
-   - Create a new module in `modules/<feature>/`
-   - `index.ts` = Elysia controller, `service.ts` = business logic, `model.ts` = validation (Elysia.t)
-   - `.use()` the module in `app/api/[[...slugs]]/route.ts`
-   - Use `drizzle-typebox` via `db/model.ts` for validation models
+   - Create a new module in `modules/<feature>/` and `.use()` it in `modules/server.ts`
+   - Simple style: see `modules/auth/` (`index.ts`, `service.ts`, `model.ts`)
+   - Hexagonal style: see `modules/todo/` (domain, application use cases + ports, infrastructure adapters, `di/`)
+   - Use `drizzle-typebox` via `db/model.ts` for validation models where applicable
 
 3. **New page?**
    - Create file in `app/[locale]/your-page/page.tsx`
@@ -293,10 +293,10 @@ modules/
 │   └── model.ts    # Validation schema (Elysia.t / drizzle-typebox)
 ```
 
-Then compose in `route.ts`:
+Then compose in `modules/server.ts`:
 ```typescript
 import { featureModule } from "@/modules/<feature>"
-const app = new Elysia({ prefix: "/api" }).use(featureModule)
+// app = new Elysia({ prefix: "/api" }).use(featureModule) ...
 ```
 
 ---
@@ -326,7 +326,7 @@ When working on this project:
 | Task | Action |
 |------|--------|
 | Add shadcn component | `bunx shadcn@latest add <name>` |
-| Create migration | Edit schema → `bun run generate` → `bun run migrate` |
+| Create migration | Edit schema → `bun run db:generate` → `bun run db:migrate` |
 | Add translation | Edit `messages/en.json` & `messages/th.json` |
 | Test in browser | Use `cursor-browser-extension` or `user-playwright` MCP |
 | Check auth docs | MCP `user-better-auth` → `search` |
