@@ -51,3 +51,4 @@ bun.lock
 skills-lock.json
 .agents
 .claude
+dist
